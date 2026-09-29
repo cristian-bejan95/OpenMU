@@ -4,7 +4,6 @@
 
 namespace MUnique.OpenMU.Persistence.Initialization.VersionSeason2;
 
-using MUnique.OpenMU.DataModel.Configuration;
 using MUnique.OpenMU.Persistence.Initialization.CharacterClasses;
 
 /// <summary>
@@ -70,7 +69,12 @@ internal class Season2ContentRestriction : InitializerBase
         this.RestrictMaps();
     }
 
-    private static bool IsAfterSeason2(GameMapDefinition map)
+    /// <summary>
+    /// Determines whether the specified map was introduced after Season 2.
+    /// </summary>
+    /// <param name="map">The map.</param>
+    /// <returns><c>true</c>, if the map was introduced after Season 2; otherwise, <c>false</c>.</returns>
+    internal static bool IsAfterSeason2(GameMapDefinition map)
     {
         return MapsAfterSeason2.Contains(map.Number)
                || (map.Number == DevilSquareHighMapNumber && map.Discriminator == DevilSquare7Discriminator);

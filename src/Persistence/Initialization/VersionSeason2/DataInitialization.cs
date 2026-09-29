@@ -6,7 +6,6 @@ namespace MUnique.OpenMU.Persistence.Initialization.VersionSeason2;
 
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using MUnique.OpenMU.DataModel.Configuration;
 using MUnique.OpenMU.Network.PlugIns;
 using MUnique.OpenMU.PlugIns;
 

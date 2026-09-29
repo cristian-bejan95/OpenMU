@@ -99,4 +99,44 @@ internal class Season2DataTest
             .ToList();
         Assert.That(gates, Is.Empty);
     }
+
+    /// <summary>
+    /// Tests that items of later seasons don't drop from monsters.
+    /// </summary>
+    /// <param name="group">The item group.</param>
+    /// <param name="number">The item number.</param>
+    [TestCase(12, 36)] // Wing of Storm (3rd wings)
+    [TestCase(12, 41)] // Wings of Curse (Summoner)
+    [TestCase(12, 49)] // Cape of Fighter (Rage Fighter)
+    [TestCase(0, 26)] // Flameberge (socket item)
+    [TestCase(12, 70)] // Sphere (Mono)
+    public void ItemOfLaterSeasonIsNotObtainable(int group, int number)
+    {
+        var item = this._gameConfiguration.Items.Single(i => i.Group == group && i.Number == number);
+        Assert.That(item.DropsFromMonsters, Is.False);
+        Assert.That(this._gameConfiguration.DropItemGroups.Where(g => g.PossibleItems.Contains(item)), Is.Empty);
+        Assert.That(this._gameConfiguration.Monsters.Where(m => m.MerchantStore?.Items.Any(i => i.Definition == item) is true), Is.Empty);
+    }
+
+    /// <summary>
+    /// Tests that crafting recipes of later seasons are not available.
+    /// </summary>
+    /// <param name="craftingNumber">The crafting number.</param>
+    [TestCase(38)] // 3rd Level Wings, Stage 1
+    [TestCase(39)] // 3rd Level Wings, Stage 2
+    [TestCase(37)] // Illusion Temple Ticket
+    public void CraftingOfLaterSeasonIsNotAvailable(int craftingNumber)
+    {
+        var npcs = this._gameConfiguration.Monsters.Where(m => m.ItemCraftings.Any(c => c.Number == craftingNumber));
+        Assert.That(npcs, Is.Empty);
+    }
+
+    /// <summary>
+    /// Tests that the second wings are still craftable.
+    /// </summary>
+    [Test]
+    public void SecondWingsCraftingIsAvailable()
+    {
+        Assert.That(this._gameConfiguration.Monsters.Any(m => m.ItemCraftings.Any(c => c.Number == 7)), Is.True);
+    }
 }

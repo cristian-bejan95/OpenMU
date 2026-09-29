@@ -4,15 +4,14 @@
 
 namespace MUnique.OpenMU.Persistence.Initialization.VersionSeason2;
 
-using MUnique.OpenMU.DataModel.Configuration;
-
 /// <summary>
 /// Initializes the <see cref="GameConfiguration"/> for a classic Season 2 server.
 /// </summary>
 /// <remarks>
 /// It creates the complete Season 6 configuration first, so that all references between
 /// maps, monsters, items and events stay consistent. Afterwards, the content which came
-/// after Season 2 is made unreachable by the <see cref="Season2ContentRestriction"/>.
+/// after Season 2 is made unreachable by the <see cref="Season2ContentRestriction"/>
+/// and the <see cref="Season2ItemRestriction"/>.
 /// </remarks>
 public class GameConfigurationInitializer : VersionSeasonSix.GameConfigurationInitializer
 {
@@ -31,5 +30,6 @@ public class GameConfigurationInitializer : VersionSeasonSix.GameConfigurationIn
     {
         base.Initialize();
         new Season2ContentRestriction(this.Context, this.GameConfiguration).Initialize();
+        new Season2ItemRestriction(this.Context, this.GameConfiguration).Initialize();
     }
 }
