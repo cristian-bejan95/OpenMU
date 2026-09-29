@@ -107,12 +107,13 @@ internal class Season2ContentRestriction : InitializerBase
 
     private void RestrictMaps()
     {
-        var removedMaps = this.GameConfiguration.Maps.Where(IsAfterSeason2).ToList();
-        var gatesOfRemovedMaps = removedMaps.SelectMany(map => map.ExitGates).ToHashSet();
+        // Note: The exit gates are only linked by their Map property, they are not
+        // (necessarily) contained in the ExitGates collection of the map during the initialization.
+        static bool LeadsToRemovedMap(ExitGate? gate) => gate?.Map is { } targetMap && IsAfterSeason2(targetMap);
 
         // Remove the /move (warp) entries to the maps of later seasons.
         var warpsToRemove = this.GameConfiguration.WarpList
-            .Where(warp => warp.Gate is not null && gatesOfRemovedMaps.Contains(warp.Gate))
+            .Where(warp => LeadsToRemovedMap(warp.Gate))
             .ToList();
         foreach (var warp in warpsToRemove)
         {
@@ -123,7 +124,7 @@ internal class Season2ContentRestriction : InitializerBase
         foreach (var map in this.GameConfiguration.Maps.Where(map => !IsAfterSeason2(map)))
         {
             var gatesToRemove = map.EnterGates
-                .Where(gate => gate.TargetGate is not null && gatesOfRemovedMaps.Contains(gate.TargetGate))
+                .Where(gate => LeadsToRemovedMap(gate.TargetGate))
                 .ToList();
             foreach (var gate in gatesToRemove)
             {
