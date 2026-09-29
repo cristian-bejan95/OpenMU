@@ -347,5 +347,23 @@ namespace MUnique.OpenMU.Persistence.Initialization.Properties {
                 return ResourceManager.GetString("DataInitialization095d_Name", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Season 2 (Classic) Initialization.
+        /// </summary>
+        public static string DataInitializationSeason2_Name {
+            get {
+                return ResourceManager.GetString("DataInitializationSeason2_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provides initial data for a classic Season 2 server, based on the Season 6 data without the content of later seasons..
+        /// </summary>
+        public static string DataInitializationSeason2_Description {
+            get {
+                return ResourceManager.GetString("DataInitializationSeason2_Description", resourceCulture);
+            }
+        }
     }
 }

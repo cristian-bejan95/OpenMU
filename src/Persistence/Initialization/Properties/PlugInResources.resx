@@ -110,6 +110,12 @@
   <data name="DataInitialization095d_Description" xml:space="preserve">
     <value>Provides initial data for Version 0.95d</value>
   </data>
+  <data name="DataInitializationSeason2_Name" xml:space="preserve">
+    <value>Season 2 (Classic) Initialization</value>
+  </data>
+  <data name="DataInitializationSeason2_Description" xml:space="preserve">
+    <value>Provides initial data for a classic Season 2 server, based on the Season 6 data without the content of later seasons.</value>
+  </data>
   <data name="DataInitialization_Name" xml:space="preserve">
     <value>Season 6 Episode 3 Initialization</value>
   </data>
