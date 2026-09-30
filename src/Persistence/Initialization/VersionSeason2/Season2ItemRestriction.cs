@@ -117,7 +117,7 @@ internal class Season2ItemRestriction : InitializerBase
 
     private HashSet<ItemDefinition> DetermineItemsAfterSeason2()
     {
-        var reachableClasses = this.DetermineReachableClasses();
+        var reachableClasses = Season2ContentRestriction.DetermineReachableClasses(this.GameConfiguration);
         var result = new HashSet<ItemDefinition>();
         foreach (var item in this.GameConfiguration.Items)
         {
@@ -141,21 +141,6 @@ internal class Season2ItemRestriction : InitializerBase
             .OfType<ItemDefinition>()
             .Where(ticket => !ticketsOfRemainingEvents.Contains(ticket));
         result.UnionWith(ticketsOfRemovedEvents);
-
-        return result;
-    }
-
-    private HashSet<CharacterClass> DetermineReachableClasses()
-    {
-        var result = new HashSet<CharacterClass>();
-        foreach (var characterClass in this.GameConfiguration.CharacterClasses.Where(c => c.CanGetCreated))
-        {
-            var current = characterClass;
-            while (current is not null && result.Add(current))
-            {
-                current = current.NextGenerationClass;
-            }
-        }
 
         return result;
     }

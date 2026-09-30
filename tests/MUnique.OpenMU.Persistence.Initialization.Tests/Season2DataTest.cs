@@ -6,6 +6,7 @@ namespace MUnique.OpenMU.Persistence.Initialization.Tests;
 
 using Microsoft.Extensions.Logging.Abstractions;
 using MUnique.OpenMU.DataModel.Configuration;
+using MUnique.OpenMU.DataModel.Configuration.Quests;
 using MUnique.OpenMU.Persistence.InMemory;
 
 /// <summary>
@@ -138,5 +139,47 @@ internal class Season2DataTest
     public void SecondWingsCraftingIsAvailable()
     {
         Assert.That(this._gameConfiguration.Monsters.Any(m => m.ItemCraftings.Any(c => c.Number == 7)), Is.True);
+    }
+
+    /// <summary>
+    /// Tests that there is no quest for the 3rd class change.
+    /// </summary>
+    [Test]
+    public void NoQuestForThirdClassChange()
+    {
+        var quests = this._gameConfiguration.Monsters
+            .SelectMany(npc => npc.Quests)
+            .Where(q => q.Rewards.Any(r => r.RewardType == QuestRewardType.CharacterEvolutionSecondToThird))
+            .Select(q => q.Name.ToString())
+            .ToList();
+        Assert.That(quests, Is.Empty);
+    }
+
+    /// <summary>
+    /// Tests that there are no quests for classes which can't be reached.
+    /// </summary>
+    /// <param name="classNumber">The class number.</param>
+    [TestCase(20)] // Summoner
+    [TestCase(22)] // Bloody Summoner
+    public void NoQuestForUnreachableClass(int classNumber)
+    {
+        var quests = this._gameConfiguration.Monsters
+            .SelectMany(npc => npc.Quests)
+            .Where(q => q.QualifiedCharacter?.Number == classNumber)
+            .Select(q => q.Name.ToString())
+            .ToList();
+        Assert.That(quests, Is.Empty);
+    }
+
+    /// <summary>
+    /// Tests that the quest for the 2nd class change still exists.
+    /// </summary>
+    [Test]
+    public void QuestForSecondClassChangeExists()
+    {
+        var hasQuest = this._gameConfiguration.Monsters
+            .SelectMany(npc => npc.Quests)
+            .Any(q => q.QualifiedCharacter?.Number == 4 && q.Rewards.Any(r => r.RewardType == QuestRewardType.CharacterEvolutionFirstToSecond));
+        Assert.That(hasQuest, Is.True);
     }
 }

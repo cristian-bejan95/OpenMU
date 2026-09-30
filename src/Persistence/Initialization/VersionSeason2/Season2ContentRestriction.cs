@@ -4,6 +4,7 @@
 
 namespace MUnique.OpenMU.Persistence.Initialization.VersionSeason2;
 
+using MUnique.OpenMU.DataModel.Configuration.Quests;
 using MUnique.OpenMU.Persistence.Initialization.CharacterClasses;
 
 /// <summary>
@@ -16,6 +17,8 @@ using MUnique.OpenMU.Persistence.Initialization.CharacterClasses;
 ///   <item>Summoner and Rage Fighter can't be created.</item>
 ///   <item>There are no master classes (3rd class change), so there is no master level.</item>
 ///   <item>Maps of later seasons are removed from the warp list (/move) and all gates leading to them are removed.</item>
+///   <item>Quests of classes which can't be reached are removed, as well as all quests of the NPC
+///         which leads to the 3rd class change (the master class quest line).</item>
 /// </list>
 /// </remarks>
 internal class Season2ContentRestriction : InitializerBase
@@ -67,6 +70,27 @@ internal class Season2ContentRestriction : InitializerBase
     {
         this.RestrictCharacterClasses();
         this.RestrictMaps();
+        this.RestrictQuests();
+    }
+
+    /// <summary>
+    /// Determines the character classes which a player can reach, by creation or by class changes.
+    /// </summary>
+    /// <param name="gameConfiguration">The game configuration.</param>
+    /// <returns>The reachable character classes.</returns>
+    internal static HashSet<CharacterClass> DetermineReachableClasses(GameConfiguration gameConfiguration)
+    {
+        var result = new HashSet<CharacterClass>();
+        foreach (var characterClass in gameConfiguration.CharacterClasses.Where(c => c.CanGetCreated))
+        {
+            var current = characterClass;
+            while (current is not null && result.Add(current))
+            {
+                current = current.NextGenerationClass;
+            }
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -133,6 +157,33 @@ internal class Season2ContentRestriction : InitializerBase
             foreach (var gate in gatesToRemove)
             {
                 map.EnterGates.Remove(gate);
+            }
+        }
+    }
+
+    private void RestrictQuests()
+    {
+        var reachableClasses = DetermineReachableClasses(this.GameConfiguration);
+
+        // The NPC which gives the quest for the 3rd class change also gives the quests leading
+        // to it (e.g. "Evidence of Strength", "Infiltrate The Barracks of Balgass").
+        // None of them existed in Season 2.
+        var masterQuestGivers = this.GameConfiguration.Monsters
+            .Where(npc => npc.Quests.Any(q => q.Rewards.Any(r => r.RewardType == QuestRewardType.CharacterEvolutionSecondToThird)))
+            .ToList();
+        foreach (var npc in masterQuestGivers)
+        {
+            npc.Quests.Clear();
+        }
+
+        foreach (var npc in this.GameConfiguration.Monsters)
+        {
+            var questsOfUnreachableClasses = npc.Quests
+                .Where(q => q.QualifiedCharacter is { } characterClass && !reachableClasses.Contains(characterClass))
+                .ToList();
+            foreach (var quest in questsOfUnreachableClasses)
+            {
+                npc.Quests.Remove(quest);
             }
         }
     }
