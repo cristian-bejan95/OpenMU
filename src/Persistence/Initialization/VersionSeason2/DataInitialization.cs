@@ -15,7 +15,7 @@ using MUnique.OpenMU.PlugIns;
 /// <remarks>
 /// The game data is based on the Season 6 data of OpenMU, restricted to the content
 /// which existed up to Season 2 (see <see cref="Season2ContentRestriction"/>).
-/// The server accepts a Season 2 client and, for testing, the Season 6 Episode 3 client.
+/// The server accepts a Season 2 client, the Season 6 Episode 3 client and the open source client (MuMain).
 /// </remarks>
 [Guid("6E3A5F52-2B0C-4E5B-9C1D-5A2F0E7B8C42")]
 [PlugIn]
@@ -59,7 +59,8 @@ public class DataInitialization : DataInitializationBase
     /// <inheritdoc />
     /// <remarks>
     /// The connect servers get their ports assigned in the order of the season,
-    /// so the Season 2 client uses port 44405 and the Season 6 client uses port 44406.
+    /// so the Season 2 client uses port 44405, the Season 6 client uses port 44406
+    /// and the open source client (MuMain) uses port 44407.
     /// </remarks>
     protected override void CreateGameClientDefinition()
     {
@@ -83,5 +84,15 @@ public class DataInitialization : DataInitializationBase
         season6Client.Version = [0x31, 0x30, 0x34, 0x30, 0x34];
         season6Client.Serial = "k1Pk2jcET48mxL3b"u8.ToArray();
         season6Client.Description = "Season 6 Episode 3 GMO Client";
+
+        // The open source client (MuMain), which uses a slightly extended Season 6 protocol.
+        var openSourceClient = this.Context.CreateNew<GameClientDefinition>();
+        openSourceClient.SetGuid(0x204D);
+        openSourceClient.Season = 106;
+        openSourceClient.Episode = 3;
+        openSourceClient.Language = ClientLanguage.English;
+        openSourceClient.Version = [0x32, 0x30, 0x34, 0x30, 0x34];
+        openSourceClient.Serial = "k1Pk2jcET48mxL3b"u8.ToArray();
+        openSourceClient.Description = "Season 6 Episode 3 Open Source Client";
     }
 }
