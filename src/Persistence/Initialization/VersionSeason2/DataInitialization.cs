@@ -15,8 +15,7 @@ using MUnique.OpenMU.PlugIns;
 /// <remarks>
 /// The game data is based on the Season 6 data of OpenMU, restricted to the content
 /// which existed up to Season 2 (see <see cref="Season2ContentRestriction"/>).
-/// Until the protocol of an original Season 2 client is supported, the server
-/// accepts the Season 6 Episode 3 client, so that the data can already be tested in game.
+/// The server accepts a Season 2 client and, for testing, the Season 6 Episode 3 client.
 /// </remarks>
 [Guid("6E3A5F52-2B0C-4E5B-9C1D-5A2F0E7B8C42")]
 [PlugIn]
@@ -58,16 +57,31 @@ public class DataInitialization : DataInitializationBase
     protected override IGameMapsInitializer GameMapsInitializer => new VersionSeasonSix.GameMapsInitializer(this.Context, this.GameConfiguration);
 
     /// <inheritdoc />
+    /// <remarks>
+    /// The connect servers get their ports assigned in the order of the season,
+    /// so the Season 2 client uses port 44405 and the Season 6 client uses port 44406.
+    /// </remarks>
     protected override void CreateGameClientDefinition()
     {
-        // Until the Season 2 protocol is implemented, the Season 6 Episode 3 client is used to connect.
-        var client = this.Context.CreateNew<GameClientDefinition>();
-        client.SetGuid(0x104D);
-        client.Season = 6;
-        client.Episode = 3;
-        client.Language = ClientLanguage.English;
-        client.Version = [0x31, 0x30, 0x34, 0x30, 0x34];
-        client.Serial = "k1Pk2jcET48mxL3b"u8.ToArray();
-        client.Description = "Season 6 Episode 3 GMO Client (temporary for Season 2 data)";
+        // A Season 2 client (main version 1.07.48, as used by the Ex-Team Season 2.4 client).
+        // The version is stored in the main.exe with an offset per character ("22:8=").
+        var season2Client = this.Context.CreateNew<GameClientDefinition>();
+        season2Client.SetGuid(0x0200);
+        season2Client.Season = 2;
+        season2Client.Episode = 0;
+        season2Client.Language = ClientLanguage.English;
+        season2Client.Version = "10748"u8.ToArray();
+        season2Client.Serial = "1I8rk9srd4Klakg3"u8.ToArray();
+        season2Client.Description = "Season 2 Client (1.07.48)";
+
+        // The Season 6 Episode 3 client is kept, so that the game data can be tested with it, too.
+        var season6Client = this.Context.CreateNew<GameClientDefinition>();
+        season6Client.SetGuid(0x104D);
+        season6Client.Season = 6;
+        season6Client.Episode = 3;
+        season6Client.Language = ClientLanguage.English;
+        season6Client.Version = [0x31, 0x30, 0x34, 0x30, 0x34];
+        season6Client.Serial = "k1Pk2jcET48mxL3b"u8.ToArray();
+        season6Client.Description = "Season 6 Episode 3 GMO Client";
     }
 }
